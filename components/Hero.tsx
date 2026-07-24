@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { heroSlides } from "@/lib/data";
+import PillArrowButton from "./ui/PillArrowButton";
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
@@ -38,7 +39,7 @@ export default function Hero() {
                 fill
                 priority
                 sizes="100vw"
-                className="object-cover"
+                className={`object-cover ${slide.posMobile ?? ""}`}
               />
             </motion.div>
           </AnimatePresence>
@@ -50,7 +51,7 @@ export default function Hero() {
           {/* Content */}
           <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-center px-6 pb-10 pt-28 sm:px-10 sm:pb-14 lg:px-16">
             {/* Headline + caption row */}
-            <div className="flex -translate-y-8 flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex -translate-y-20 flex-col gap-8 sm:-translate-y-8 lg:flex-row lg:items-end lg:justify-between">
               {/* Big title */}
               <div>
                 <AnimatePresence mode="wait">
@@ -80,6 +81,11 @@ export default function Hero() {
                     ))}
                   </motion.h1>
                 </AnimatePresence>
+
+                {/* Enquire — mobile only (desktop has it in the navbar) */}
+                <div className="mt-7 lg:hidden">
+                  <PillArrowButton href="#contact" label="Enquire" />
+                </div>
               </div>
             </div>
           </div>

@@ -2,6 +2,8 @@ export const heroSlides = [
   {
     // Dusk gateway — leads the deck.
     img: "/images/hero-9.png",
+    // On mobile the narrow crop hides the right-side gateway; frame toward it.
+    posMobile: "object-[60%_center] sm:object-center",
     title: ["Golden", "Hours"],
     caption: {
       heading: "Evenings at Radha Vatika",
@@ -10,6 +12,7 @@ export const heroSlides = [
   },
   {
     img: "/images/hero-5.png",
+    posMobile: "",
     title: ["Community", "Living"],
     caption: {
       heading: "Space to gather",
@@ -18,6 +21,7 @@ export const heroSlides = [
   },
   {
     img: "/images/hero-4.png",
+    posMobile: "",
     title: ["Building", "Beyond"],
     caption: {
       heading: "Beyond structures",

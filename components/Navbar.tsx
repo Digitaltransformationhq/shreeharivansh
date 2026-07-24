@@ -38,17 +38,6 @@ export default function Navbar() {
           <div className="hidden lg:block">
             <PillArrowButton href="#contact" label="Enquire" />
           </div>
-
-          <button
-            aria-label="Menu"
-            onClick={() => setOpen(true)}
-            className="grid h-11 w-11 place-items-center rounded-full bg-bone/15 backdrop-blur lg:hidden"
-          >
-            <div className="space-y-[5px]">
-              <span className="block h-[2px] w-5 bg-bone" />
-              <span className="block h-[2px] w-5 bg-bone" />
-            </div>
-          </button>
         </div>
 
         {/* Centered white island (desktop) */}
@@ -82,6 +71,35 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Mobile menu toggle — the two bars rotate into an X in place, and it
+          stays above the overlay so its position never shifts. */}
+      <button
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpen((o) => !o)}
+        className={`absolute right-6 top-[17px] z-[70] grid h-11 w-11 place-items-center rounded-full backdrop-blur lg:hidden ${
+          open ? "bg-ink/10" : "bg-bone/15"
+        }`}
+      >
+        <span className="relative block h-4 w-5">
+          <motion.span
+            className={`absolute left-0 top-[7px] block h-[2px] w-5 rounded-full ${
+              open ? "bg-ink" : "bg-bone"
+            }`}
+            initial={false}
+            animate={{ y: open ? 0 : -4, rotate: open ? 45 : 0 }}
+            transition={{ duration: 0.35, ease: [0.76, 0, 0.24, 1] }}
+          />
+          <motion.span
+            className={`absolute left-0 top-[7px] block h-[2px] w-5 rounded-full ${
+              open ? "bg-ink" : "bg-bone"
+            }`}
+            initial={false}
+            animate={{ y: open ? 0 : 4, rotate: open ? -45 : 0 }}
+            transition={{ duration: 0.35, ease: [0.76, 0, 0.24, 1] }}
+          />
+        </span>
+      </button>
+
       {/* Mobile overlay */}
       <AnimatePresence>
         {open && (
@@ -89,17 +107,10 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-rust-deep/98 backdrop-blur lg:hidden"
+            className="fixed inset-0 z-[60] bg-bone/95 backdrop-blur-xl lg:hidden"
           >
-            <div className="flex items-center justify-between px-6 py-6">
-              <span className="text-lg font-semibold text-bone">SHREE</span>
-              <button
-                aria-label="Close"
-                onClick={() => setOpen(false)}
-                className="grid h-11 w-11 place-items-center rounded-full bg-bone/10 text-bone"
-              >
-                ✕
-              </button>
+            <div className="flex items-center px-6 py-6">
+              <span className="text-lg font-semibold text-ink">SHREE</span>
             </div>
             <div className="flex flex-col gap-2 px-6 pt-8">
               {navLinks.map((l, i) => (
@@ -112,15 +123,12 @@ export default function Navbar() {
                   <Link
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="block border-b border-bone/10 py-4 font-display text-4xl italic text-bone"
+                    className="block border-b border-ink/10 py-4 font-display text-4xl italic text-ink"
                   >
                     {l.label}
                   </Link>
                 </motion.div>
               ))}
-              <div className="pt-8">
-                <PillArrowButton href="#contact" label="Enquire" />
-              </div>
             </div>
           </motion.div>
         )}
