@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
+import { navLinks } from "@/lib/data";
 
 // Navbar island geometry — identical to Navbar.tsx so the curtain edge
 // matches the real bar exactly.
@@ -49,12 +50,12 @@ export default function IntroReveal() {
             </svg>
             {/* mirror the real nav links so the handoff is seamless */}
             <div className="absolute inset-0 flex items-center justify-center gap-2">
-              {["Projects", "About us", "Blog", "Contact"].map((l) => (
+              {navLinks.map((l) => (
                 <span
-                  key={l}
+                  key={l.label}
                   className="px-4 py-1.5 text-[13.5px] font-medium text-ink/75"
                 >
-                  {l}
+                  {l.label}
                 </span>
               ))}
             </div>

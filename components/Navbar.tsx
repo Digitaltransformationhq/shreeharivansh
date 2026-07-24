@@ -4,13 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import PillArrowButton from "./ui/PillArrowButton";
-
-const links = [
-  { label: "About Us", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Brochure", href: "#brochure" },
-  { label: "Contact", href: "#contact" },
-];
+import { navLinks } from "@/lib/data";
 
 // Centered white "island" geometry — full-width flat top that narrows toward
 // the bottom with smooth convex curves, so the image shows in the bottom corners.
@@ -74,7 +68,7 @@ export default function Navbar() {
             </svg>
             {/* Links overlaid on the island */}
             <nav className="pointer-events-auto absolute inset-0 flex items-center justify-center gap-2">
-              {links.map((l) => (
+              {navLinks.map((l) => (
                 <Link
                   key={l.label}
                   href={l.href}
@@ -108,7 +102,7 @@ export default function Navbar() {
               </button>
             </div>
             <div className="flex flex-col gap-2 px-6 pt-8">
-              {links.map((l, i) => (
+              {navLinks.map((l, i) => (
                 <motion.div
                   key={l.label}
                   initial={{ x: 30, opacity: 0 }}

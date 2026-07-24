@@ -26,6 +26,13 @@ export const heroSlides = [
   },
 ];
 
+export const navLinks = [
+  { label: "About Us", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Brochure", href: "#brochure" },
+  { label: "Contact", href: "#contact" },
+];
+
 export const recentProjects = [
   {
     img: "/images/hero-6.png",
