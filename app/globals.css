@@ -1,26 +1,104 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Shree Harivansh — Design System
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --rust: #4a2c1c;        /* deep terracotta page frame */
+  --rust-deep: #3d2416;
+  --bone: #f4f1ec;        /* warm off-white */
+  --bone-2: #e9e5dd;
+  --paper: #ffffff;
+  --ink: #16130f;         /* near-black text */
+  --ink-2: #4a453d;       /* muted text */
+  --line: #dcd7cd;        /* hairlines */
+  --accent: #b4643c;      /* burnt clay accent */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-rust: var(--rust);
+  --color-rust-deep: var(--rust-deep);
+  --color-bone: var(--bone);
+  --color-bone-2: var(--bone-2);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-script: var(--font-script);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--rust);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Display serif helper — the signature elegant italic */
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Script helper — the calligraphic wordmark */
+.font-script {
+  font-family: var(--font-script), "Segoe Script", cursive;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--bone);
+}
+
+/* Bottom-center concave dip used on the project image cards */
+.notch-dip {
+  -webkit-mask:
+    radial-gradient(26px at 50% 100%, transparent 98%, #000) 50% 100% / 100% 26px no-repeat,
+    linear-gradient(#000, #000) 0 0 / 100% calc(100% - 13px) no-repeat;
+  mask:
+    radial-gradient(26px at 50% 100%, transparent 98%, #000) 50% 100% / 100% 26px no-repeat,
+    linear-gradient(#000, #000) 0 0 / 100% calc(100% - 13px) no-repeat;
+}
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 34s linear infinite;
+}
+.marquee-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* Subtle film grain overlay */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Hide the scrollbar (scrolling still works) */
+::-webkit-scrollbar { width: 0; height: 0; display: none; }
+html {
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* old Edge / IE */
 }
