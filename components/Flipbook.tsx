@@ -10,37 +10,34 @@ const PH = 1950;
 const BASE_W = 350;
 const BASE_H = Math.round((BASE_W * PH) / PW);
 
+// Let the two-page spread shrink far enough to fit a phone (each page is half
+// the container). No portrait/single-page mode — the whole open brochure shows
+// at every width, just like desktop.
+const MIN_W = 130;
+
 export default function Flipbook() {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(0);
-  const portraitRef = useRef(false);
+  const [ready, setReady] = useState(false);
 
-  // Measure the real available width so we can force a single full-width page
-  // on mobile (react-pageflip's own width detection is unreliable here).
+  // Only instantiate page-flip once the container is mounted and has a real
+  // width (its own width detection is unreliable at first paint).
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const update = () => setW(Math.round(el.clientWidth));
-    update();
-    const ro = new ResizeObserver(update);
+    const check = () => setReady(el.clientWidth > 0);
+    check();
+    const ro = new ResizeObserver(check);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
-  const portrait = w > 0 && w < 640;
-  portraitRef.current = portrait;
-  // On mobile: page fills the container (single page). On desktop: a spread.
-  const minW = portrait ? w : 260;
-  const maxW = portrait ? w : BASE_W;
-
-  // On desktop the book is two pages wide, but the cover and the final page are
+  // The book is always two pages wide, but the cover and the final page are
   // shown alone — on the right and left halves respectively — so the book reads
   // off-centre. Slide it half a page (25% of its two-page width) so the visible
   // page stays centred, and let it glide back to the middle for the two-page
   // spreads in between. Set the transform inline: react-pageflip owns the
   // element's className, and its stylesheet already puts a transform on it, so a
-  // CSS class of ours would be both clobbered and out-specified. Portrait shows
-  // one full page, so it never shifts.
+  // CSS class of ours would be both clobbered and out-specified.
   const bookRef = useRef<{ pageFlip?: () => { getCurrentPageIndex?: () => number } }>(null);
   const pageRef = useRef(0);
   const dirRef = useRef(1); // last flip direction: 1 = forward, -1 = back
@@ -48,10 +45,8 @@ export default function Flipbook() {
     const parent = wrapRef.current?.querySelector<HTMLElement>(".stf__parent");
     if (!parent) return;
     let tx = "0%";
-    if (!portraitRef.current) {
-      if (p <= 0) tx = "-25%";
-      else if (p >= PAGES.length - 1) tx = "25%";
-    }
+    if (p <= 0) tx = "-25%";
+    else if (p >= PAGES.length - 1) tx = "25%";
     parent.style.transition = animate
       ? "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)"
       : "none";
@@ -76,7 +71,6 @@ export default function Flipbook() {
   // shift and the page-turn move together. On settle ("read") re-sync to the real
   // page, which also corrects a drag that was released and snapped back.
   const onState = (state: string) => {
-    if (portraitRef.current) return;
     if (state === "flipping") {
       position(targetOf(pageRef.current));
     } else if (state === "read") {
@@ -99,22 +93,25 @@ export default function Flipbook() {
   };
 
   return (
-    <div ref={wrapRef} className="w-full" onPointerDown={onPointerDown}>
-      {w === 0 ? (
-        <div className="mx-auto aspect-[1387/1950] w-[350px] max-w-full animate-pulse rounded-lg bg-bone-2" />
+    <div
+      ref={wrapRef}
+      className="w-full overflow-x-clip"
+      onPointerDown={onPointerDown}
+    >
+      {!ready ? (
+        <div className="mx-auto aspect-[2774/1950] w-full max-w-[700px] animate-pulse rounded-lg bg-bone-2" />
       ) : (
         // @ts-expect-error — react-pageflip's prop types are loose
         <HTMLFlipBook
           ref={bookRef}
-          key={portrait ? "portrait" : "landscape"}
           width={BASE_W}
           height={BASE_H}
           size="stretch"
-          minWidth={minW}
-          maxWidth={maxW}
-          minHeight={Math.round((minW * PH) / PW)}
-          maxHeight={Math.round((maxW * PH) / PW)}
-          usePortrait
+          minWidth={MIN_W}
+          maxWidth={BASE_W}
+          minHeight={Math.round((MIN_W * PH) / PW)}
+          maxHeight={Math.round((BASE_W * PH) / PW)}
+          usePortrait={false}
           drawShadow
           maxShadowOpacity={0.4}
           showCover
@@ -128,10 +125,6 @@ export default function Flipbook() {
             position(e.data);
           }}
           onChangeState={(e: { data: string }) => onState(e.data)}
-          onChangeOrientation={() => {
-            pageRef.current = 0;
-            position(0, false);
-          }}
           className="flipbook mx-auto"
         >
           {PAGES.map((src, i) => (
