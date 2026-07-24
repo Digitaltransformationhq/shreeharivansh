@@ -96,6 +96,23 @@ body {
   pointer-events: none;
 }
 
+/* Flipbook: cast the resting drop shadow on the actual page leaves rather
+   than the book wrapper. The wrapper is always two pages wide, so on the
+   single-page states (front cover, last page) its shadow used to frame the
+   empty half and read as a phantom blank page. Shadowing the leaves means an
+   empty half casts nothing and blends into the section behind it. */
+.flipbook .stf__item {
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+/* The book slides half a page so the visible page stays centred as it opens and
+   closes (the cover and last page are shown alone on opposite halves). The
+   transform/transition are applied inline from Flipbook.tsx; this just hints the
+   compositor. */
+.flipbook {
+  will-change: transform;
+}
+
 /* Hide the scrollbar (scrolling still works) */
 ::-webkit-scrollbar { width: 0; height: 0; display: none; }
 html {
