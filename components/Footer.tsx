@@ -63,11 +63,32 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Oversized wordmark — spans the footer, flush to the bottom */}
-      <div className="select-none px-3 pt-10 sm:px-5">
-        <span className="block whitespace-nowrap text-[12.6vw] font-medium leading-[0.72] tracking-[-0.02em] text-bone">
-          Shree Harivansh
-        </span>
+      {/* Oversized wordmark — spans the footer edge to edge, flush to the
+          bottom. Drawn as SVG text rather than a font-size in vw: `textLength`
+          pins the width to the viewBox exactly, so it always fills the footer
+          regardless of how Fraunces italic actually measures. `lengthAdjust`
+          is "spacing", so only the letter gaps flex — glyphs are never
+          stretched. The viewBox is cropped to the baseline; "Shree Harivansh"
+          has no descenders, so the letters sit flush to the bottom edge. */}
+      <div className="select-none pt-10">
+        <svg
+          viewBox="0 0 710 82"
+          className="block h-auto w-full text-bone"
+          role="img"
+          aria-label="Shree Harivansh"
+        >
+          <text
+            x="0"
+            y="78"
+            textLength="710"
+            lengthAdjust="spacing"
+            fill="currentColor"
+            fontSize="100"
+            className="font-display font-light italic"
+          >
+            Shree Harivansh
+          </text>
+        </svg>
       </div>
     </footer>
   );

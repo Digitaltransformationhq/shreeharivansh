@@ -1,6 +1,5 @@
 import Label from "./ui/Label";
 import Reveal from "./ui/Reveal";
-import Stats from "./ui/Stats";
 
 export default function About() {
   return (
@@ -29,9 +28,6 @@ export default function About() {
             </Reveal>
           </div>
         </div>
-
-        {/* Stats */}
-        <Stats />
       </div>
     </section>
   );

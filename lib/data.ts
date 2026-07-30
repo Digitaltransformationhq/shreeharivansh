@@ -11,12 +11,14 @@ export const heroSlides = [
     },
   },
   {
-    img: "/images/hero-5.png",
-    posMobile: "",
-    title: ["Community", "Living"],
+    // Daytime arrival at the gateway — signage sits right of centre, so the
+    // narrow mobile crop needs the same nudge as the dusk slide.
+    img: "/images/hero-7.png",
+    posMobile: "object-[60%_center] sm:object-center",
+    title: ["Gated", "Address"],
     caption: {
-      heading: "Space to gather",
-      body: "Clubhouses, pools, and green commons built for the life between the buildings.",
+      heading: "Arrive through the gates",
+      body: "A single controlled entrance, palm-lined boundaries, and the quiet assurance of a private address.",
     },
   },
   {
@@ -43,7 +45,7 @@ export const recentProjects = [
     status: "New Launch",
     title: "Radha Vatika",
     subtitle: "Pre-Lease Plots & Resort",
-    spec: "40 Premium Gated Plots",
+    spec: "57 Premium Gated Plots",
     location: "Chansad–Padra Main Road, Vadodara",
     priceLabel: "Price",
     price: "On Request",
@@ -74,11 +76,4 @@ export const caseStudies = [
     title: "The White Apartment",
     body: "Redefining urban elegance — bridging heritage and modern living in an iconic residential landmark.",
   },
-];
-
-export const stats = [
-  { value: "180+", label: "Projects delivered" },
-  { value: "24", label: "Design awards" },
-  { value: "15", label: "Years of practice" },
-  { value: "40", label: "Architects & engineers" },
 ];

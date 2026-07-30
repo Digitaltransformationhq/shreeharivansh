@@ -1,7 +1,7 @@
-import { Download } from "lucide-react";
 import Label from "./ui/Label";
 import Reveal from "./ui/Reveal";
 import Flipbook from "./Flipbook";
+import BrochureDownload from "./BrochureDownload";
 
 export default function Brochure() {
   return (
@@ -36,14 +36,7 @@ export default function Brochure() {
         </div>
 
         <Reveal className="mt-10 flex justify-center">
-          <a
-            href="/brochure/radha-vatika-brochure.pdf"
-            download
-            className="inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-3.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-bone transition-colors hover:bg-accent"
-          >
-            <Download size={16} strokeWidth={2.2} />
-            Download Brochure
-          </a>
+          <BrochureDownload />
         </Reveal>
       </div>
     </section>
