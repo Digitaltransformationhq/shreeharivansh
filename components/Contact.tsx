@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { MapPin, Phone, Mail, ArrowUpRight } from "lucide-react";
 import Reveal from "./ui/Reveal";
+import { sendEnquiry, type LeadState } from "@/lib/leads";
 
 const PHONE_DISPLAY = "+91 63563 46862";
 const PHONE_HREF = "tel:+916356346862";
@@ -24,70 +25,19 @@ const MAP_EMBED_SRC = `https://www.google.com/maps?q=${encodeURIComponent(
   "Radha Vatika, Chansad-Padra Main Road, Darapura, Padra, Vadodara, Gujarat 391440"
 )}&t=k&z=16&output=embed`;
 
-type FieldErrors = Partial<Record<"name" | "phone" | "email", string>>;
-
-/** Gmail's compose deep-link — opens a new mail with everything filled in. */
-function gmailComposeUrl(subject: string, body: string) {
-  const params = new URLSearchParams({
-    view: "cm",
-    fs: "1",
-    to: EMAIL,
-    su: subject,
-    body,
-  });
-  return `https://mail.google.com/mail/?${params.toString()}`;
-}
-
-function mailtoUrl(subject: string, body: string) {
-  return `mailto:${EMAIL}?subject=${encodeURIComponent(
-    subject
-  )}&body=${encodeURIComponent(body)}`;
-}
+const INITIAL_STATE: LeadState = { status: "idle", message: "" };
 
 export default function Contact() {
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const [opened, setOpened] = useState<{ gmail: string; mailto: string } | null>(
-    null
+  const formRef = useRef<HTMLFormElement>(null);
+  const [state, formAction, pending] = useActionState(
+    sendEnquiry,
+    INITIAL_STATE
   );
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const name = String(data.get("name") ?? "").trim();
-    const phone = String(data.get("phone") ?? "").trim();
-    const email = String(data.get("email") ?? "").trim();
-    const message = String(data.get("message") ?? "").trim();
-
-    const next: FieldErrors = {};
-    if (name.length < 2) next.name = "Please enter your name.";
-    if (phone.replace(/\D/g, "").length < 10)
-      next.phone = "Please enter a valid phone number.";
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      next.email = "Please enter a valid email address.";
-
-    setErrors(next);
-    if (Object.keys(next).length > 0) {
-      setOpened(null);
-      return;
-    }
-
-    const subject = `Enquiry — Radha Vatika (${name})`;
-    const body = [
-      `Name: ${name}`,
-      `Phone: ${phone}`,
-      `Email: ${email || "—"}`,
-      "",
-      message || "I'd like to know more about Radha Vatika.",
-    ].join("\n");
-
-    const links = {
-      gmail: gmailComposeUrl(subject, body),
-      mailto: mailtoUrl(subject, body),
-    };
-    // opened straight from the click, so it isn't treated as a popup
-    window.open(links.gmail, "_blank", "noopener,noreferrer");
-    setOpened(links);
-  };
+  // clear the fields once an enquiry has actually gone out
+  useEffect(() => {
+    if (state.status === "sent") formRef.current?.reset();
+  }, [state]);
 
   const inputCls =
     "w-full rounded-lg border border-line bg-transparent px-4 py-3 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-2/70 focus:border-accent";
@@ -187,9 +137,20 @@ export default function Contact() {
         {/* Right — enquiry form */}
         <Reveal i={1}>
           <form
-            onSubmit={onSubmit}
+            ref={formRef}
+            action={formAction}
             className="rounded-[22px] border border-line bg-paper p-6 shadow-[0_20px_45px_-30px_rgba(22,19,15,0.3)] sm:p-8"
           >
+            {/* honeypot — hidden from people, irresistible to bots */}
+            <input
+              type="text"
+              name="botcheck"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="hidden"
+            />
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="enq-name" className={labelCls}>
@@ -201,10 +162,13 @@ export default function Contact() {
                   type="text"
                   required
                   autoComplete="name"
-                  aria-invalid={!!errors.name}
+                  defaultValue={state.values?.name}
+                  aria-invalid={!!state.fieldErrors?.name}
                   className={inputCls}
                 />
-                {errors.name && <p className={errCls}>{errors.name}</p>}
+                {state.fieldErrors?.name && (
+                  <p className={errCls}>{state.fieldErrors.name}</p>
+                )}
               </div>
               <div>
                 <label htmlFor="enq-phone" className={labelCls}>
@@ -217,10 +181,13 @@ export default function Contact() {
                   required
                   autoComplete="tel"
                   inputMode="tel"
-                  aria-invalid={!!errors.phone}
+                  defaultValue={state.values?.phone}
+                  aria-invalid={!!state.fieldErrors?.phone}
                   className={inputCls}
                 />
-                {errors.phone && <p className={errCls}>{errors.phone}</p>}
+                {state.fieldErrors?.phone && (
+                  <p className={errCls}>{state.fieldErrors.phone}</p>
+                )}
               </div>
             </div>
             <div className="mt-4">
@@ -232,10 +199,13 @@ export default function Contact() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                aria-invalid={!!errors.email}
+                defaultValue={state.values?.email}
+                aria-invalid={!!state.fieldErrors?.email}
                 className={inputCls}
               />
-              {errors.email && <p className={errCls}>{errors.email}</p>}
+              {state.fieldErrors?.email && (
+                <p className={errCls}>{state.fieldErrors.email}</p>
+              )}
             </div>
             <div className="mt-4">
               <label htmlFor="enq-message" className={labelCls}>
@@ -251,41 +221,25 @@ export default function Contact() {
             </div>
 
             <div aria-live="polite">
-              {Object.keys(errors).length > 0 && (
-                <p className="mt-5 rounded-lg bg-[#b4442a]/10 px-4 py-3 text-[13px] leading-relaxed text-[#b4442a]">
-                  Please check the highlighted fields.
+              {state.message && (
+                <p
+                  className={`mt-5 rounded-lg px-4 py-3 text-[13px] leading-relaxed ${
+                    state.status === "sent"
+                      ? "bg-accent/10 text-accent"
+                      : "bg-[#b4442a]/10 text-[#b4442a]"
+                  }`}
+                >
+                  {state.message}
                 </p>
-              )}
-
-              {opened && (
-                <div className="mt-5 rounded-lg bg-accent/10 px-4 py-3 text-[13px] leading-relaxed text-accent">
-                  Gmail has opened in a new tab with your enquiry ready — just
-                  press <strong>Send</strong> there to reach us.
-                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
-                    <a
-                      href={opened.gmail}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline underline-offset-2"
-                    >
-                      Didn&apos;t open? Click here
-                    </a>
-                    <a
-                      href={opened.mailto}
-                      className="underline underline-offset-2"
-                    >
-                      Use a different email app
-                    </a>
-                  </div>
-                </div>
               )}
             </div>
 
             <button
               type="submit"
-              className="mt-6 w-full rounded-lg bg-ink px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-bone transition-colors hover:bg-accent"
+              disabled={pending}
+              className="mt-6 w-full rounded-lg bg-ink px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.06em] text-bone transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Send Enquiry
+              {pending ? "Sending…" : "Send Enquiry"}
             </button>
           </form>
         </Reveal>

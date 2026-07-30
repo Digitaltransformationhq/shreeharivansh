@@ -2,14 +2,14 @@
 
 import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { Download, X } from "lucide-react";
-import { saveBrochureLead, type LeadState } from "@/lib/leads";
+import { saveBrochureLead, type BrochureLeadState } from "@/lib/leads";
 
 const PDF_HREF = "/brochure/radha-vatika-brochure.pdf";
 const PDF_FILENAME = "Radha-Vatika-Brochure.pdf";
 /** Once details are given, don't ask again for the rest of the visit. */
 const SESSION_KEY = "rv-brochure-lead";
 
-const INITIAL_STATE: LeadState = {
+const INITIAL_STATE: BrochureLeadState = {
   status: "idle",
   message: "",
   allowDownload: false,
@@ -39,7 +39,7 @@ export default function BrochureDownload() {
     if (!open || !state.allowDownload) return;
     sessionStorage.setItem(SESSION_KEY, "1");
     downloadRef.current?.click();
-    if (state.status !== "saved") return;
+    if (state.status !== "sent") return;
     const t = setTimeout(() => setOpen(false), 2200);
     return () => clearTimeout(t);
   }, [open, state]);
@@ -162,18 +162,18 @@ export default function BrochureDownload() {
                 </label>
                 <input
                   id="lead-mobile"
-                  name="mobile"
+                  name="phone"
                   type="tel"
                   required
                   autoComplete="tel"
                   inputMode="tel"
                   placeholder="10-digit mobile number"
-                  defaultValue={state.values?.mobile}
-                  aria-invalid={!!state.fieldErrors?.mobile}
+                  defaultValue={state.values?.phone}
+                  aria-invalid={!!state.fieldErrors?.phone}
                   className={inputCls}
                 />
-                {state.fieldErrors?.mobile && (
-                  <p className={errCls}>{state.fieldErrors.mobile}</p>
+                {state.fieldErrors?.phone && (
+                  <p className={errCls}>{state.fieldErrors.phone}</p>
                 )}
               </div>
 
@@ -199,7 +199,7 @@ export default function BrochureDownload() {
                 {state.message && (
                   <div
                     className={`mt-5 rounded-lg px-4 py-3 text-[13px] leading-relaxed ${
-                      state.status === "saved"
+                      state.status === "sent"
                         ? "bg-accent/10 text-accent"
                         : "bg-[#b4442a]/10 text-[#b4442a]"
                     }`}
